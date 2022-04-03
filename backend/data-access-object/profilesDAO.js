@@ -1,3 +1,6 @@
+import mongodb from "mongodb"
+const ObjectId = mongodb.ObjectId
+
 let profiles
 
 export default class ProfilesDAO {
@@ -27,6 +30,10 @@ export default class ProfilesDAO {
                 query = { "email": { $eq: filters["email"] } }
             } else if ("password" in filters) {
                 query = { "password": { $eq: filters["password"] } }
+            } else if ("bio" in filters) {
+                query = { "bio": { $eq: filters["bio"] } }
+            } else if ("profile_image" in filters) {
+                query = { "profile_image": { $eq: filters["profile_image"] } }
             }
         }
 
@@ -54,4 +61,18 @@ export default class ProfilesDAO {
             return { profilesList: [], totalNumProfiles: 0 }
         }
     }
+
+    static async updateProfile(profileId, userId, name, bio, profileImage) {
+        try {
+            const updateResponse = await profiles.updateOne(
+                { user_id: userId, _id: profileId },
+                { $set: { name: name, bio: bio, profile_image: profileImage } }
+            )
+            return updateResponse
+        } catch (e) {
+            console.error(`Unable to update profile: ${e}`)
+            return { error: e }
+        }
+    }
+
 }
